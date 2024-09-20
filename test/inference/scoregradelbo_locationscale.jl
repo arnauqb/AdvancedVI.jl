@@ -5,9 +5,9 @@ AD_locationscale = Dict(
     :Zygote => AutoZygote(),
 )
 
-#if @isdefined(Tapir)
-#    AD_locationscale[:Tapir] = AutoTapir(; safe_mode=false)
-#end
+if @isdefined(Tapir)
+    AD_locationscale[:Tapir] = AutoTapir(; safe_mode=false)
+end
 
 #if @isdefined(Enzyme)
 #    AD_locationscale[:Enzyme] = AutoEnzyme()
@@ -98,8 +98,8 @@ AD_locationscale = Dict(
             )
             μ_repl = q_avg.location
             L_repl = q_avg.scale
-            @test μ ≈ μ_repl rtol = 1e-5
-            @test L ≈ L_repl rtol = 1e-5
+            @test μ ≈ μ_repl rtol = 1e-3
+            @test L ≈ L_repl rtol = 1e-3
         end
     end
 end

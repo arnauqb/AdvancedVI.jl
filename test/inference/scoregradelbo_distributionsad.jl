@@ -5,9 +5,9 @@ AD_distributionsad = Dict(
     :Zygote => AutoZygote(),
 )
 
-#if @isdefined(Tapir)
-#    AD_distributionsad[:Tapir] = AutoTapir(; safe_mode=false)
-#end
+if @isdefined(Tapir)
+    AD_distributionsad[:Tapir] = AutoTapir(; safe_mode=false)
+end
 
 #if @isdefined(Enzyme)
 #    AD_distributionsad[:Enzyme] = AutoEnzyme()

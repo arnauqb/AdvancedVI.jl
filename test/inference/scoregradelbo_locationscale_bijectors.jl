@@ -5,9 +5,9 @@ AD_locationscale_bijectors = Dict(
     :Zygote => AutoZygote(),
 )
 
-#if @isdefined(Tapir)
-#    AD_locationscale_bijectors[:Tapir] = AutoTapir(; safe_mode=false)
-#end
+if @isdefined(Tapir)
+    AD_locationscale_bijectors[:Tapir] = AutoTapir(; safe_mode=false)
+end
 
 #if @isdefined(Enzyme)
 #    AD_locationscale_bijectors[:Enzyme] = AutoEnzyme()

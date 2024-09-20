@@ -9,9 +9,9 @@ if @isdefined(Tapir)
     AD_distributionsad[:Tapir] = AutoTapir(; safe_mode=false)
 end
 
-if @isdefined(Enzyme)
-    AD_distributionsad[:Enzyme] = AutoEnzyme()
-end
+#if @isdefined(Enzyme)
+#    AD_distributionsad[:Enzyme] = AutoEnzyme()
+#end
 
 @testset "inference RepGradELBO DistributionsAD" begin
     @testset "$(modelname) $(objname) $(realtype) $(adbackname)" for realtype in

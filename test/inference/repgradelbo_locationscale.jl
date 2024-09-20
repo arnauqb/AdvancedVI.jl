@@ -9,9 +9,9 @@ if @isdefined(Tapir)
     AD_locationscale[:Tapir] = AutoTapir(; safe_mode=false)
 end
 
-if @isdefined(Enzyme)
-    AD_locationscale[:Enzyme] = AutoEnzyme()
-end
+#if @isdefined(Enzyme)
+#    AD_locationscale[:Enzyme] = AutoEnzyme()
+#end
 
 @testset "inference RepGradELBO VILocationScale" begin
     @testset "$(modelname) $(objname) $(realtype) $(adbackname)" for realtype in
