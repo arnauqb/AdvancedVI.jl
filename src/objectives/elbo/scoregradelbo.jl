@@ -64,6 +64,10 @@ function Base.show(io::IO, obj::ScoreGradELBO)
 	print(io, ")")
 end
 
+function sample_from_q(::ScoreGradELBO, rng, q, q_stop, n_samples)
+    return rand(rng, q_stop, n_samples)
+end
+
 function compute_control_variate_baseline(history, window_size)
     if length(history) == 0
         return 1.0
@@ -95,7 +99,7 @@ function estimate_objective(
 	prob;
 	n_samples::Int = obj.n_samples,
 )
-    samples, entropy = reparam_with_entropy(rng, q, q, obj.n_samples, obj.entropy)
+    samples, entropy = reparam_with_entropy(rng, q, q, obj.n_samples, obj.entropy, obj)
 	energy = map(Base.Fix1(LogDensityProblems.logdensity, prob), eachsample(samples))
 	return mean(energy) + entropy
 end
@@ -109,7 +113,7 @@ function estimate_scoregradelbo_ad_forward(params′, aux)
 	@unpack rng, obj, problem, restructure, q_stop = aux
     baseline = compute_control_variate_baseline(obj.baseline_history, obj.baseline_window_size)
 	q = restructure(params′)
-    samples_stop, entropy = reparam_with_entropy(rng, q, q_stop, obj.n_samples, obj.entropy)
+    samples_stop, entropy = reparam_with_entropy(rng, q, q_stop, obj.n_samples, obj.entropy, obj)
 	elbo = compute_elbo(q, q_stop, samples_stop, entropy, problem, baseline)
 	return -elbo
 end

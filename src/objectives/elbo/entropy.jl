@@ -42,3 +42,12 @@ function estimate_entropy_maybe_stl(entropy_estimator::AbstractEntropyEstimator,
     q_maybe_stop = maybe_stop_entropy_score(entropy_estimator, q, q_stop)
     estimate_entropy(entropy_estimator, samples, q_maybe_stop)
 end
+
+function reparam_with_entropy(
+    rng::Random.AbstractRNG, q, q_stop, n_samples::Int, ent_est::AbstractEntropyEstimator, obj::AbstractVariationalObjective
+)
+    samples = sample_from_q(obj, rng, q, q_stop, n_samples)
+    entropy = estimate_entropy_maybe_stl(ent_est, samples, q, q_stop)
+    return samples, entropy
+end
+

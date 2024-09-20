@@ -170,6 +170,41 @@ Estimate the entropy of `q`.
 """
 function estimate_entropy end
 
+"""
+    sample_from_q(obj, rng, q, q_stop, n_samples)
+
+Draw `n_samples` from `q`.
+
+# Arguments
+- `obj::AbstractVariationalObjective`: Variational objective.
+- `rng::Random.AbstractRNG`: Random number generator.
+- `q`: Variational approximation.
+- `q_stop`: Same as `q`, but held constant during differentiation. 
+- `n_samples::Int`: Number of Monte Carlo samples 
+
+# Returns
+- `samples`: Monte Carlo samples generated through reparameterization. Their support matches that of the target distribution.
+"""
+function sample_from_q end
+
+"""
+    reparam_with_entropy(rng, q, q_stop, n_samples, ent_est)
+
+Draw `n_samples` from `q` and compute its entropy.
+
+# Arguments
+- `rng::Random.AbstractRNG`: Random number generator.
+- `q`: Variational approximation.
+- `q_stop`: Same as `q`, but held constant during differentiation. Should only be used for computing the entropy.
+- `n_samples::Int`: Number of Monte Carlo samples 
+- `ent_est`: The entropy estimation strategy. (See `estimate_entropy`.)
+- `obj`: The variational objective.
+# Returns
+- `samples`: Monte Carlo samples generated through reparameterization. Their support matches that of the target distribution.
+- `entropy`: An estimate (or exact value) of the differential entropy of `q`.
+"""
+function reparam_with_entropy end
+
 export
     RepGradELBO,
     ScoreGradELBO,

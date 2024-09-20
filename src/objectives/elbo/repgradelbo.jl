@@ -49,28 +49,8 @@ function estimate_energy_with_samples(prob, samples)
     return mean(Base.Fix1(LogDensityProblems.logdensity, prob), eachsample(samples))
 end
 
-"""
-    reparam_with_entropy(rng, q, q_stop, n_samples, ent_est)
-
-Draw `n_samples` from `q` and compute its entropy.
-
-# Arguments
-- `rng::Random.AbstractRNG`: Random number generator.
-- `q`: Variational approximation.
-- `q_stop`: Same as `q`, but held constant during differentiation. Should only be used for computing the entropy.
-- `n_samples::Int`: Number of Monte Carlo samples 
-- `ent_est`: The entropy estimation strategy. (See `estimate_entropy`.)
-
-# Returns
-- `samples`: Monte Carlo samples generated through reparameterization. Their support matches that of the target distribution.
-- `entropy`: An estimate (or exact value) of the differential entropy of `q`.
-"""
-function reparam_with_entropy(
-    rng::Random.AbstractRNG, q, q_stop, n_samples::Int, ent_est::AbstractEntropyEstimator
-)
-    samples = rand(rng, q, n_samples)
-    entropy = estimate_entropy_maybe_stl(ent_est, samples, q, q_stop)
-    return samples, entropy
+function sample_from_q(::RepGradELBO, rng, q, q_stop, n_samples)
+    return rand(rng, q, n_samples)
 end
 
 function estimate_objective(
@@ -88,7 +68,7 @@ end
 function estimate_repgradelbo_ad_forward(params′, aux)
     @unpack rng, obj, problem, adtype, restructure, q_stop = aux
     q = restructure_ad_forward(adtype, restructure, params′)
-    samples, entropy = reparam_with_entropy(rng, q, q_stop, obj.n_samples, obj.entropy)
+    samples, entropy = reparam_with_entropy(rng, q, q_stop, obj.n_samples, obj.entropy, obj)
     energy = estimate_energy_with_samples(problem, samples)
     elbo = energy + entropy
     return -elbo

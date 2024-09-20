@@ -41,6 +41,7 @@ function AdvancedVI.reparam_with_entropy(
     q_stop::Bijectors.TransformedDistribution,
     n_samples::Int,
     ent_est::AdvancedVI.AbstractEntropyEstimator,
+    obj::AdvancedVI.AbstractVariationalObjective,
 )
     transform = q.transform
     q_unconst = q.dist
@@ -48,7 +49,7 @@ function AdvancedVI.reparam_with_entropy(
 
     # Draw samples and compute entropy of the uncontrained distribution
     unconstr_samples, unconst_entropy = AdvancedVI.reparam_with_entropy(
-        rng, q_unconst, q_unconst_stop, n_samples, ent_est
+        rng, q_unconst, q_unconst_stop, n_samples, ent_est, obj
     )
 
     # Apply bijector to samples while estimating its jacobian
