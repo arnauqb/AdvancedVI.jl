@@ -54,7 +54,14 @@ end
 
 function estimate_energy_with_samples(prob, samples)
     return mean(Base.Fix1(LogDensityProblems.logdensity, prob), eachsample(samples))
+    #logdensity_fn = Base.Fix1(LogDensityProblems.logdensity, prob)
+    #return mean(fetch.([Threads.@spawn logdensity_fn(sample) for sample in eachsample(samples)]))
 end
+
+#function estimate_energy_with_samples_aux(fn, samples)
+    #return mean(fetch.([Threads.@spawn fn(sample) for sample in eachsample(samples)]))
+#end
+
 
 """
     reparam_with_entropy(rng, q, q_stop, n_samples, ent_est)

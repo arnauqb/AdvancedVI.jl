@@ -45,3 +45,20 @@ function catsamples_and_acc(
     ∑y = last(state_curr) + last(state_new)
     return (x, ∑y)
 end
+
+function threaded_sampling(distribution, n_samples)
+    return fetch.([Threads.@spawn rand(distribution) for _ in 1:n_samples])
+end
+
+function ChainRulesCore.rrule(::typeof(threaded_sampling), distribution, n_samples)
+    y = threaded_sampling(distribution, n_samples)
+    function threaded_sampling_pullback(ȳ)
+        function distribution_pullback(dist)
+            grads = fetch.([Threads.@spawn ChainRulesCore.rrule(rand, dist)[2](ȳ_i) for (ȳ_i, _) in zip(ȳ, 1:n_samples)])
+            return sum(last.(grads))
+        end
+        return (NoTangent(), distribution_pullback(distribution), NoTangent())
+    end
+    return y, threaded_sampling_pullback
+end
+
