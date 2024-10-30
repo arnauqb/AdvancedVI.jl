@@ -80,16 +80,14 @@ function estimate_objective(obj::ScoreGradELBO, q, prob; n_samples::Int=obj.n_sa
 end
 
 function estimate_scoregradelbo_ad_forward(params′, aux)
-    @unpack rng, obj, problem, adtype, restructure, samples, q_stop, baseline = aux
+    @unpack rng, obj, problem, adtype, restructure, samples, q_stop, baseline, ℓπ = aux
     q = restructure_ad_forward(adtype, restructure, params′)
 
     ℓq = logpdf.(Ref(q), AdvancedVI.eachsample(samples))
     ℓq_stop = logpdf.(Ref(q_stop), AdvancedVI.eachsample(samples))
-    ℓπ = map(Base.Fix1(LogDensityProblems.logdensity, problem), eachsample(samples))
     ℓπ_mean = mean(ℓπ)
     score_grad = mean(@. ℓq * (ℓπ - baseline))
     score_grad_stop = mean(@. ℓq_stop * (ℓπ - baseline))
-
     energy = ℓπ_mean + (score_grad - score_grad_stop)
     entropy = estimate_entropy(obj.entropy, samples, q)
 
@@ -116,6 +114,7 @@ function AdvancedVI.estimate_gradient!(
     end
     q_stop = restructure(params)
     samples = rand(rng, q_stop, obj.n_samples)
+    ℓπ = map(Base.Fix1(LogDensityProblems.logdensity, prob), eachsample(samples))
     aux = (
         rng=rng,
         adtype=adtype,
@@ -125,6 +124,7 @@ function AdvancedVI.estimate_gradient!(
         baseline=baseline,
         samples=samples,
         q_stop=q_stop,
+        ℓπ=ℓπ,
     )
     AdvancedVI.value_and_gradient!(
         adtype, estimate_scoregradelbo_ad_forward, params, aux, out
